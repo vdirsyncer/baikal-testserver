@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from vdirsyncer.utils import expand_path
-import subprocess
 import os
+import subprocess
 import time
+
 import pytest
+
 import requests
 
 owncloud_repo = os.path.dirname(__file__)
@@ -27,11 +28,8 @@ def wait():
 
 
 class ServerMixin(object):
-    storage_class = None
-    wsgi_teardown = None
-
     @pytest.fixture(autouse=True)
-    def setup(self, monkeypatch, xprocess):
+    def setup(self, xprocess):
         def preparefunc(cwd):
             return wait, ['sh', php_sh]
 
