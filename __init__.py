@@ -46,13 +46,12 @@ class ServerMixin(object):
                 url += '/cal.php/calendars/asdf/'
             else:
                 raise RuntimeError(self.storage_class.fileext)
-            if collection is not None:
-                # the following collections are setup in Baikal
-                assert collection in ('test', 'test1', 'test2', 'test3',
-                                      'test4', 'test5', 'test6', 'test7',
-                                      'test8', 'test9', 'test10')
-                url += collection
 
-            return {'url': url, 'collection': collection, 'username': 'asdf',
-                    'password': 'asdf', 'unsafe_href_chars': ''}
+            rv = {'url': url, 'username': 'asdf', 'password': 'asdf',
+                  'unsafe_href_chars': ''}
+            if collection is not None:
+                return self.storage_class.create_collection(
+                    collection=collection, **rv)
+            else:
+                return rv
         return inner
