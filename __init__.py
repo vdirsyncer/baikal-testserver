@@ -47,8 +47,7 @@ class ServerMixin(object):
             else:
                 raise RuntimeError(self.storage_class.fileext)
 
-            rv = {'url': url, 'username': 'asdf', 'password': 'asdf',
-                  'unsafe_href_chars': ''}
+            rv = {'url': url, 'username': 'asdf', 'password': 'asdf'}
             if collection is not None:
                 return self.storage_class.create_collection(
                     collection=collection, **rv)
