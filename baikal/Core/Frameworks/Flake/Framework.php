@@ -113,10 +113,27 @@ class Framework extends \Flake\Core\Framework {
 
 		# Undo magic_quotes as this cannot be disabled by .htaccess on PHP ran as CGI
 		# Source: http://stackoverflow.com/questions/517008/how-to-turn-off-magic-quotes-on-shared-hosting
+		# Also: https://github.com/netgusto/Baikal/issues/155
 		if(in_array(strtolower(ini_get('magic_quotes_gpc')), array('1', 'on'))) {
-			$_POST = array_map('stripslashes', $_POST);
-			$_GET = array_map('stripslashes', $_GET);
-			$_COOKIE = array_map('stripslashes', $_COOKIE);
+			$process = array();
+			if(isset($_GET) && is_array($_GET)) { $process[] = &$_GET;}
+			if(isset($_POST) && is_array($_POST)) { $process[] = &$_POST;}
+			if(isset($_COOKIE) && is_array($_COOKIE)) { $process[] = &$_COOKIE;}
+			if(isset($_REQUEST) && is_array($_REQUEST)) { $process[] = &$_REQUEST;}
+
+			while (list($key, $val) = each($process)) {
+				foreach ($val as $k => $v) {
+				    unset($process[$key][$k]);
+				    if (is_array($v)) {
+				        $process[$key][stripslashes($k)] = $v;
+				        $process[] = &$process[$key][stripslashes($k)];
+				    } else {
+				        $process[$key][stripslashes($k)] = stripslashes($v);
+				    }
+				}
+			}
+			
+			unset($process);
 		}
 
 		# Fixing some CGI environments, that prefix HTTP_AUTHORIZATION (forwarded in .htaccess) with "REDIRECT_"
@@ -137,13 +154,7 @@ class Framework extends \Flake\Core\Framework {
 
 		require_once(PROJECT_PATH_CORE . "Distrib.php");
 
-		if(PROJECT_PACKAGE === "regular") {
-			define("PROJECT_PATH_DOCUMENTROOT", PROJECT_PATH_ROOT . "html/");
-		} elseif(PROJECT_PACKAGE === "flat") {
-			define("PROJECT_PATH_DOCUMENTROOT", PROJECT_PATH_ROOT);
-		} else {
-			throw new \Exception("Unrecognized PROJECT_PACKAGE value.");
- 		}
+        define("PROJECT_PATH_DOCUMENTROOT", PROJECT_PATH_ROOT . "html/");
 
 		# Determine PROJECT_BASEURI
 		$sScript = substr($_SERVER["SCRIPT_FILENAME"], strlen($_SERVER["DOCUMENT_ROOT"]));
@@ -169,9 +180,6 @@ class Framework extends \Flake\Core\Framework {
 
 		#################################################################################################
 		
-		require_once(FLAKE_PATH_ROOT . 'Util/Twig/lib/Twig/Autoloader.php');
-		\Twig_Autoloader::register();
-
 		# Include Flake Framework config
 		require_once(FLAKE_PATH_ROOT . "config.php");
 
@@ -230,18 +238,8 @@ class Framework extends \Flake\Core\Framework {
 			return FALSE;
 		}
 		
-		# Asserting DB file exists
-		if(!file_exists(PROJECT_SQLITE_FILE)) {
-			die("<h3>DB file does not exist. To create it, please copy '<span style='font-family: monospace; background: yellow;'>Core/Resources/Db/SQLite/db.sqlite</span>' to '<span style='font-family: monospace;background: yellow;'>" . PROJECT_SQLITE_FILE . "</span>'</h3>");
-		}
-		
-		# Asserting DB file is readable
-		if(!is_readable(PROJECT_SQLITE_FILE)) {
-			die("<h3>DB file is not readable. Please give read permissions on file '<span style='font-family: monospace; background: yellow;'>" . PROJECT_SQLITE_FILE . "</span>'</h3>");
-		}
-		
 		# Asserting DB file is writable
-		if(!is_writable(PROJECT_SQLITE_FILE)) {
+		if(file_exists(PROJECT_SQLITE_FILE) && !is_writable(PROJECT_SQLITE_FILE)) {
 			die("<h3>DB file is not writable. Please give write permissions on file '<span style='font-family: monospace; background: yellow;'>" . PROJECT_SQLITE_FILE . "</span>'</h3>");
 		}
 		
@@ -276,19 +274,15 @@ class Framework extends \Flake\Core\Framework {
 			die("<h3>The constant PROJECT_DB_MYSQL_PASSWORD, containing the MySQL database password, is not set.<br />You should set it in Specific/config.system.php</h3>");
 		}
 		
-		try {
-			$GLOBALS["DB"] = new \Flake\Core\Database\Mysql(
-				PROJECT_DB_MYSQL_HOST,
-				PROJECT_DB_MYSQL_DBNAME,
-				PROJECT_DB_MYSQL_USERNAME,
-				PROJECT_DB_MYSQL_PASSWORD
-			);
+        $GLOBALS["DB"] = new \Flake\Core\Database\Mysql(
+            PROJECT_DB_MYSQL_HOST,
+            PROJECT_DB_MYSQL_DBNAME,
+            PROJECT_DB_MYSQL_USERNAME,
+            PROJECT_DB_MYSQL_PASSWORD
+        );
 
-			# We now setup the connexion to use UTF8
-			$GLOBALS["DB"]->query("SET NAMES UTF8");
-		} catch(\Exception $e) {
-			#die("<h3>Baïkal was not able to establish a connexion to the configured MySQL database (as configured in Specific/config.system.php).</h3>");
-		}
+        # We now setup the connection to use UTF8
+        $GLOBALS["DB"]->query("SET NAMES UTF8");
 		
 		return TRUE;
 	}

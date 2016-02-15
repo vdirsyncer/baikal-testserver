@@ -47,13 +47,14 @@ class Mysql extends \Flake\Core\Database {
 			'mysql:host=' . $this->sHost . ';dbname=' . $this->sDbName,
 			$this->sUsername,
 			$this->sPassword
-		);
+        );
+        $this->oDb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 	}
 	
 	public function tables() {
 		$aTables = array();
 		
-		$sSql = "SHOW TABLES FROM " . $this->sDbName;
+		$sSql = "SHOW TABLES FROM `" . $this->sDbName . "`";
 		$oStmt = $this->query($sSql);
 		
 		while(($aRs = $oStmt->fetch()) !== FALSE) {

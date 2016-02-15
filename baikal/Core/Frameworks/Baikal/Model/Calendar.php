@@ -35,7 +35,6 @@ class Calendar extends \Flake\Core\Model\Db {
 		"principaluri" => "",
 		"displayname" => "",
 		"uri" => "",
-		"ctag" => 0,
 		"description" => "",
 		"calendarorder" => 0,
 		"calendarcolor" => "",
@@ -161,6 +160,18 @@ class Calendar extends \Flake\Core\Model\Db {
 				"content" => "This is the name that will be displayed in your CalDAV client.",
 			)
 		)));
+
+        $oMorpho->add(new \Formal\Element\Text(array(
+            "prop" => "calendarcolor",
+            "label" => "Calendar color",
+            "validation" => "color",
+            "popover" => array(
+                    "title" => "Calendar color",
+                    "content" => "This is the color that will be displayed in your CalDAV client.</br>".
+                    "Must be supplied in format '#RRGGBBAA' (alpha channel optional) with hexadecimal values.</br>".
+                    "This value is optional.",
+            )
+        )));
 
 		$oMorpho->add(new \Formal\Element\Text(array(
 			"prop" => "description",

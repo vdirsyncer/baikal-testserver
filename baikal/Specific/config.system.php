@@ -3,7 +3,7 @@
 #
 #	Copyright notice
 #
-#	(c) 2014 Jérôme Schneider <mail@jeromeschneider.fr>
+#	(c) 2016 Jérôme Schneider <mail@jeromeschneider.fr>
 #	All rights reserved
 #
 #	http://baikal-server.com
@@ -47,6 +47,9 @@ define("BAIKAL_CARD_BASEURI", PROJECT_BASEURI . "card.php/");
 # Should begin and end with a "/"
 define("BAIKAL_CAL_BASEURI", PROJECT_BASEURI . "cal.php/");
 
+# Should begin and end with a "/"
+define("BAIKAL_DAV_BASEURI", PROJECT_BASEURI . "dav.php/");
+
 # Define path to Baïkal Database SQLite file
 define("PROJECT_SQLITE_FILE", PROJECT_PATH_SPECIFIC . "db/db.sqlite");
 
@@ -66,7 +69,7 @@ define("PROJECT_DB_MYSQL_USERNAME", '');
 define("PROJECT_DB_MYSQL_PASSWORD", '');
 
 # A random 32 bytes key that will be used to encrypt data
-define("BAIKAL_ENCRYPTION_KEY", '3fa0375b62d73c419faf4b01da741b55');
+define("BAIKAL_ENCRYPTION_KEY", 'a50e555b3814fa05a6f57ba1226afa31');
 
 # The currently configured Baïkal version
-define("BAIKAL_CONFIGURED_VERSION", '0.2.7');
+define("BAIKAL_CONFIGURED_VERSION", '0.3.1');

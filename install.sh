@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
-BAIKAL_VERSION="0.2.7"
-BAIKAL_DOWNLOAD_URL="http://baikal-server.com/get/baikal-flat-${BAIKAL_VERSION}.zip"
+BAIKAL_VERSION="0.3.1"
+BAIKAL_DOWNLOAD_URL="https://github.com/fruux/Baikal/releases/download/${BAIKAL_VERSION}/baikal-${BAIKAL_VERSION}.zip"
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 echo "install.sh: Own directory is $DIR"
 
@@ -23,7 +23,6 @@ if [ ! -d baikal ]; then
     fi
     echo "Extracting Baikal"
     unzip baikal.zip
-    mv baikal-flat baikal
 fi
 
 sh $DIR/reset.sh
