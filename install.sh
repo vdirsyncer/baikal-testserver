@@ -25,4 +25,6 @@ if [ ! -d baikal ]; then
     unzip baikal.zip
 fi
 
+pip install pytest-xprocess
+
 sh $DIR/reset.sh
