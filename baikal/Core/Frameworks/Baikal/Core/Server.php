@@ -24,6 +24,7 @@
 #  This copyright notice MUST APPEAR in all copies of the script!
 #################################################################
 
+
 namespace Baikal\Core;
 
 use PDO;
@@ -133,7 +134,8 @@ class Server {
         if ($this->authType === 'Basic') {
             $authBackend = new \Baikal\Core\PDOBasicAuth($this->pdo, $this->authRealm);
         } else {
-            $authBackend = new \Sabre\DAV\Auth\Backend\PDO($this->pdo, $this->authRealm);
+            $authBackend = new \Sabre\DAV\Auth\Backend\PDO($this->pdo);
+            $authBackend->setRealm($this->authRealm);
         }
         $principalBackend = new \Sabre\DAVACL\PrincipalBackend\PDO($this->pdo);
 
@@ -145,7 +147,7 @@ class Server {
             $nodes[] = new \Sabre\CalDAV\CalendarRoot($principalBackend, $calendarBackend);
         }
         if ($this->enableCardDAV) {
-            $carddavBackend = new \Sabre\CardDAV\Backend\PDO($GLOBALS["DB"]->getPDO());
+            $carddavBackend = new \Sabre\CardDAV\Backend\PDO($this->pdo);
             $nodes[] = new \Sabre\CardDAV\AddressBookRoot($principalBackend, $carddavBackend);
         }
 
@@ -156,9 +158,17 @@ class Server {
         $this->server->addPlugin(new \Sabre\DAVACL\Plugin());
         $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin());
 
+        $this->server->addPlugin(new \Sabre\DAV\PropertyStorage\Plugin(
+            new \Sabre\DAV\PropertyStorage\Backend\PDO($this->pdo)
+        ));
+
+        // WebDAV-Sync!
+        $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
+
         if ($this->enableCalDAV) {
             $this->server->addPlugin(new \Sabre\CalDAV\Plugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
+            $this->server->addPlugin(new \Sabre\CalDAV\Schedule\Plugin());
         }
         if ($this->enableCardDAV) {
             $this->server->addPlugin(new \Sabre\CardDAV\Plugin());

@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-BAIKAL_VERSION="0.3.1"
+BAIKAL_VERSION="0.4.4"
 BAIKAL_DOWNLOAD_URL="https://github.com/fruux/Baikal/releases/download/${BAIKAL_VERSION}/baikal-${BAIKAL_VERSION}.zip"
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 echo "install.sh: Own directory is $DIR"

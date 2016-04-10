@@ -1,6 +1,20 @@
 ChangeLog
 =========
 
+3.1.2 (2016-03-12)
+------------------
+
+* #784: Sync logs for address books were not correctly cleaned up after
+  deleting them.
+* #787: Cannot use non-seekable stream-wrappers with range requests.
+* Faster XML parsing and generating due to sabre/xml update.
+* #793: The Sqlite schema is now more strict and more similar to the MySQL
+  schema. This solves a problem within Baikal.
+* The zip release ships with [sabre/vobject 4.0.3][vobj],
+  [sabre/http 4.2.1][http], [sabre/event 3.0.0][evnt],
+  [sabre/uri 1.1.0][uri] and [sabre/xml 1.4.1][xml].
+
+
 3.1.1 (2016-01-25)
 ------------------
 
@@ -73,6 +87,18 @@ ChangeLog
 * The zip release ships with [sabre/vobject 4.0.0-alpha1][vobj],
   [sabre/http 4.0.0][http], [sabre/event 2.0.2][evnt],
   [sabre/uri 1.0.1][uri] and [sabre/xml 1.1.0][xml].
+
+
+3.0.8 (2016-03-12)
+------------------
+
+* #784: Sync logs for address books were not correctly cleaned up after
+  deleting them.
+* #787: Cannot use non-seekable stream-wrappers with range requests.
+* Faster XML parsing and generating due to sabre/xml update.
+* The zip release ships with [sabre/vobject 3.5.0][vobj],
+  [sabre/http 4.2.1][http], [sabre/event 2.0.2][evnt],
+  [sabre/uri 1.1.0][uri] and [sabre/xml 1.4.1][xml].
 
 
 3.0.7 (2016-01-12)
@@ -312,6 +338,13 @@ ChangeLog
 * #582: `Sabre\DAV\Auth\Plugin::getCurrentUser()` is now deprecated. Use
   `Sabre\DAV\Auth\Plugin::getCurrentPrincipal()` instead.
 * #193: Fix `Sabre\DAV\FSExt\Directory::getQuotaInfo()` on windows.
+
+
+2.1.10 (2016-03-10)
+-------------------
+
+* #784: Sync logs for address books were not correctly cleaned up after
+  deleting them.
 
 
 2.1.9 (2016-01-25)

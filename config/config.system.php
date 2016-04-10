@@ -56,7 +56,7 @@ define("PROJECT_DB_MYSQL_PASSWORD", '');
 # A random 32 bytes key that will be used to encrypt data
 define("BAIKAL_ENCRYPTION_KEY", '3fa0375b62d73c419faf4b01da741b55');
 # The currently configured Baïkal version
-define("BAIKAL_CONFIGURED_VERSION", '0.3.1');
+define("BAIKAL_CONFIGURED_VERSION", '0.4.4');
 
 
 # Should begin and end with a "/"

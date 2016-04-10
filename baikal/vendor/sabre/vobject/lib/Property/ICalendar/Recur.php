@@ -54,7 +54,7 @@ class Recur extends Property {
                     if (strcmp($k, 'until') === 0) {
                         $v = strtr($v, [':' => '', '-' => '']);
                     }
-                } else {
+                } elseif (is_array($v)) {
                     $v = array_map('strtoupper', $v);
                 }
 
@@ -168,7 +168,14 @@ class Recur extends Property {
 
         $values = [];
         foreach ($this->getParts() as $k => $v) {
-            $values[strtolower($k)] = $v;
+            if (strcmp($k, 'UNTIL') === 0) {
+                $date = new DateTime($this->root, null, $v);
+                $values[strtolower($k)] = $date->getJsonValue()[0];
+            } elseif (strcmp($k, 'COUNT') === 0) {
+                $values[strtolower($k)] = intval($v);
+            } else {
+                $values[strtolower($k)] = $v;
+            }
         }
         return [$values];
 
@@ -220,6 +227,66 @@ class Recur extends Property {
         }
 
         return $newValue;
+    }
+
+    /**
+     * Validates the node for correctness.
+     *
+     * The following options are supported:
+     *   Node::REPAIR - May attempt to automatically repair the problem.
+     *
+     * This method returns an array with detected problems.
+     * Every element has the following properties:
+     *
+     *  * level - problem level.
+     *  * message - A human-readable string describing the issue.
+     *  * node - A reference to the problematic node.
+     *
+     * The level means:
+     *   1 - The issue was repaired (only happens if REPAIR was turned on)
+     *   2 - An inconsequential issue
+     *   3 - A severe issue.
+     *
+     * @param int $options
+     *
+     * @return array
+     */
+    function validate($options = 0) {
+
+        $repair = ($options & self::REPAIR);
+
+        $warnings = parent::validate($options);
+        $values = $this->getParts();
+
+        foreach ($values as $key => $value) {
+
+            if (empty($value)) {
+                $warnings[] = [
+                    'level'   => $repair ? 3 : 1,
+                    'message' => 'Invalid value for ' . $key . ' in ' . $this->name,
+                    'node'    => $this
+                ];
+                if ($repair) {
+                    unset($values[$key]);
+                }
+            }
+
+        }
+        if (!isset($values['FREQ'])) {
+            $warnings[] = [
+                'level'   => $repair ? 3 : 1,
+                'message' => 'FREQ is required in ' . $this->name,
+                'node'    => $this
+            ];
+            if ($repair) {
+                $this->parent->remove($this);
+            }
+        }
+        if ($repair) {
+            $this->setValue($values);
+        }
+
+        return $warnings;
 
     }
 
