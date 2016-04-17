@@ -11,7 +11,7 @@ if [ "$CI" = "true" ]; then
     # these packages...
     sudo apt-get update || true
 
-    sudo apt-get install php5 php5-cli php5-sqlite
+    sudo apt-get install php5-cgi php5 php5-cli php5-sqlite
 fi
 
 cd "$DIR"
