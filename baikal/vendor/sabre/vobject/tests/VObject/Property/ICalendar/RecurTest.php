@@ -3,10 +3,12 @@
 namespace Sabre\VObject\Property\ICalendar;
 
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\Node;
 use Sabre\VObject\Reader;
-use Sabre\VObject\TestCase;
 
-class RecurTest extends TestCase {
+class RecurTest extends \PHPUnit_Framework_TestCase {
+
+    use \Sabre\VObject\PHPUnitAssertions;
 
     function testParts() {
 
@@ -139,7 +141,7 @@ END:VEVENT
 END:VCALENDAR
 ';
 
-        $this->assertVObjEquals(
+        $this->assertVObjectEqualsVObject(
             $expected,
             $vcal
         );
@@ -189,10 +191,129 @@ END:VEVENT
 END:VCALENDAR
 ';
 
-        $this->assertVObjEquals(
+        $this->assertVObjectEqualsVObject(
             $expected,
             $vcal
         );
+
+    }
+
+    function testValidateInvalidByMonthRruleWithRepair() {
+
+        $calendar = new VCalendar();
+        $property = $calendar->createProperty('RRULE', 'FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=0');
+        $result = $property->validate(Node::REPAIR);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals('BYMONTH in RRULE must have value(s) between 1 and 12!', $result[0]['message']);
+        $this->assertEquals(1, $result[0]['level']);
+        $this->assertEquals('FREQ=YEARLY;COUNT=6;BYMONTHDAY=24', $property->getValue());
+
+    }
+
+    function testValidateInvalidByMonthRruleWithoutRepair() {
+
+        $calendar = new VCalendar();
+        $property = $calendar->createProperty('RRULE', 'FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=0');
+        $result = $property->validate();
+
+        $this->assertCount(1, $result);
+        $this->assertEquals('BYMONTH in RRULE must have value(s) between 1 and 12!', $result[0]['message']);
+        $this->assertEquals(3, $result[0]['level']);
+        $this->assertEquals('FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=0', $property->getValue());
+
+    }
+
+    function testValidateInvalidByMonthRruleWithRepair2() {
+
+        $calendar = new VCalendar();
+        $property = $calendar->createProperty('RRULE', 'FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=bla');
+        $result = $property->validate(Node::REPAIR);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals('BYMONTH in RRULE must have value(s) between 1 and 12!', $result[0]['message']);
+        $this->assertEquals(1, $result[0]['level']);
+        $this->assertEquals('FREQ=YEARLY;COUNT=6;BYMONTHDAY=24', $property->getValue());
+
+    }
+
+    function testValidateInvalidByMonthRruleWithoutRepair2() {
+
+        $calendar = new VCalendar();
+        $property = $calendar->createProperty('RRULE', 'FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=bla');
+        $result = $property->validate();
+
+        $this->assertCount(1, $result);
+        $this->assertEquals('BYMONTH in RRULE must have value(s) between 1 and 12!', $result[0]['message']);
+        $this->assertEquals(3, $result[0]['level']);
+        // Without repair the invalid BYMONTH is still there, but the value is changed to uppercase
+        $this->assertEquals('FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=BLA', $property->getValue());
+
+    }
+
+    function testValidateInvalidByMonthRruleValue14WithRepair() {
+
+        $calendar = new VCalendar();
+        $property = $calendar->createProperty('RRULE', 'FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=14');
+        $result = $property->validate(Node::REPAIR);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals('BYMONTH in RRULE must have value(s) between 1 and 12!', $result[0]['message']);
+        $this->assertEquals(1, $result[0]['level']);
+        $this->assertEquals('FREQ=YEARLY;COUNT=6;BYMONTHDAY=24', $property->getValue());
+
+    }
+
+    function testValidateInvalidByMonthRruleMultipleWithRepair() {
+
+        $calendar = new VCalendar();
+        $property = $calendar->createProperty('RRULE', 'FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=0,1,2,3,4,14');
+        $result = $property->validate(Node::REPAIR);
+
+        $this->assertCount(2, $result);
+        $this->assertEquals('BYMONTH in RRULE must have value(s) between 1 and 12!', $result[0]['message']);
+        $this->assertEquals(1, $result[0]['level']);
+        $this->assertEquals('BYMONTH in RRULE must have value(s) between 1 and 12!', $result[1]['message']);
+        $this->assertEquals(1, $result[1]['level']);
+        $this->assertEquals('FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=1,2,3,4', $property->getValue());
+
+    }
+
+    function testValidateOneOfManyInvalidByMonthRruleWithRepair() {
+
+        $calendar = new VCalendar();
+        $property = $calendar->createProperty('RRULE', 'FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=bla,3,foo');
+        $result = $property->validate(Node::REPAIR);
+
+        $this->assertCount(2, $result);
+        $this->assertEquals('BYMONTH in RRULE must have value(s) between 1 and 12!', $result[0]['message']);
+        $this->assertEquals(1, $result[0]['level']);
+        $this->assertEquals('BYMONTH in RRULE must have value(s) between 1 and 12!', $result[1]['message']);
+        $this->assertEquals(1, $result[1]['level']);
+        $this->assertEquals('FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=3', $property->getValue());
+
+    }
+
+    function testValidateValidByMonthRrule() {
+
+        $calendar = new VCalendar();
+        $property = $calendar->createProperty('RRULE', 'FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=2,3');
+        $this->assertEquals('FREQ=YEARLY;COUNT=6;BYMONTHDAY=24;BYMONTH=2,3', $property->getValue());
+
+    }
+
+    /**
+     * test for issue #336
+     */
+    function testValidateRruleBySecondZero() {
+
+        $calendar = new VCalendar();
+        $property = $calendar->createProperty('RRULE', 'FREQ=DAILY;BYHOUR=10;BYMINUTE=30;BYSECOND=0;UNTIL=20150616T153000Z');
+        $result = $property->validate(Node::REPAIR);
+
+        // There should be 0 warnings and the value should be unchanged
+        $this->assertEmpty($result);
+        $this->assertEquals('FREQ=DAILY;BYHOUR=10;BYMINUTE=30;BYSECOND=0;UNTIL=20150616T153000Z', $property->getValue());
 
     }
 

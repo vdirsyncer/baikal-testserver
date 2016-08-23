@@ -1,6 +1,37 @@
 ChangeLog
 =========
 
+4.1.1 (2016-07-15)
+------------------
+
+* #327: Throwing `InvalidDataException` in more cases where invalid iCalendar
+  dates and times were provided. (@rsto)
+* #331: Fix dealing with multiple overridden instances falling on the same
+  date/time (@afedyk-sugarcrm).
+* #333: Fix endless loop on invalid `BYMONTH` values in recurrence.
+  (@PHPGangsta)
+* #339: Fixed a few `validate()` results when repair is off. (@PHPGangsta)
+* #338: Stripping invalid `BYMONTH=` rules during `validate()` (@PHPGangsta)
+* #336: Fix incorrect `BYSECOND=` validation. (@PHPGangsta)
+
+
+4.1.0 (2016-04-06)
+------------------
+
+* #309: When expanding recurring events, the first event should also have a
+  `RECURRENCE-ID` property.
+* #306: iTip REPLYs to the first instance of a recurring event was not handled
+  correctly.
+* Slightly better error message during validation of `N` and `ADR` properties.
+* #312: Correctly extracing timezone in the iTip broker, even when we don't
+  have a master event. (@vkomrakov-sugar).
+* When validating a component's property that must appear once and which could
+  automatically be repaired, make sure we report the change as 'repaired'.
+* Added a PHPUnitAssertions trait. This trait makes it easy to compare two
+  vcards or iCalendar objects semantically.
+* Better error message when parsing objects with an invalid `VALUE` parameter.
+
+
 4.0.3 (2016-03-12)
 ------------------
 
@@ -112,8 +143,31 @@ ChangeLog
   and `IntegerValue` to allow PHP 7 compatibility.
 
 
-3.5.0 (2016-01-11)
+3.5.3 (????-??-??)
+------------------
+
+* #331: Fix dealing with multiple overridden instances falling on the same
+  date/time (@afedyk-sugarcrm).
+
+
+3.5.2 (2016-04-24)
 -----------------
+
+* #312: Backported a fix related to iTip processing of events with timezones,
+  without a master event.
+
+
+3.5.1 (2016-04-06)
+------------------
+
+* #309: When expanding recurring events, the first event should also have a
+  `RECURRENCE-ID` property.
+* #306: iTip REPLYs to the first instance of a recurring event was not handled
+  correctly.
+
+
+3.5.0 (2016-01-11)
+------------------
 
 * This release supports PHP 7, contrary to 3.4.x versions.
 * BC Break: `Sabre\VObject\Property\Float` has been renamed to
